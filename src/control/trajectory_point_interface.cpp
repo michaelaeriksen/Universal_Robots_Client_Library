@@ -26,6 +26,7 @@
  */
 //----------------------------------------------------------------------
 
+#include <cassert>
 #include <ur_client_library/control/trajectory_point_interface.h>
 
 namespace urcl
@@ -82,7 +83,9 @@ bool TrajectoryPointInterface::writeTrajectoryPoint(const vector6d_t* positions,
 
   size_t written;
 
-  return server_.write(client_fd_, buffer, sizeof(buffer), written);
+  assert(false);
+  return false;
+  //return server_.write(client_fd_, buffer, sizeof(buffer), written);
 }
 
 void TrajectoryPointInterface::connectionCallback(const int filedescriptor)

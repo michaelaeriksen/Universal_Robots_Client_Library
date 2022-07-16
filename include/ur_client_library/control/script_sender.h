@@ -57,7 +57,7 @@ public:
   ScriptSender(uint32_t port, const std::string& program);
 
 private:
-  comm::TCPServer server_;
+  //comm::TCPServer server_;
   std::thread script_thread_;
   std::string program_;
 

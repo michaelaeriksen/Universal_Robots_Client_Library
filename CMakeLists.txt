@@ -9,57 +9,140 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 
-##
-## Check C++11 support / enable global pedantic and Wall
-##
-include(DefineCXX17CompilerFlag)
-DEFINE_CXX_17_COMPILER_FLAG(CXX17_FLAG)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+if (WIN32)
+  if(NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 17)
+  endif()
+else ()
+  ##
+  ## Check C++11 support / enable global pedantic and Wall
+  ##
+  include(DefineCXX17CompilerFlag)
+  DEFINE_CXX_17_COMPILER_FLAG(CXX17_FLAG)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+endif ()
+
+set (SOURCE_FILES
+  src/comm/tcp_socket.cpp
+  src/comm/tcp_server.cpp
+  src/control/reverse_interface.cpp
+  src/control/script_sender.cpp
+  src/control/trajectory_point_interface.cpp
+  src/primary/primary_package.cpp
+  src/primary/robot_message.cpp
+  src/primary/robot_state.cpp
+  src/primary/robot_message/version_message.cpp
+  src/primary/robot_state/kinematics_info.cpp
+  src/rtde/control_package_pause.cpp
+  src/rtde/control_package_setup_inputs.cpp
+  src/rtde/control_package_setup_outputs.cpp
+  src/rtde/control_package_start.cpp
+  src/rtde/data_package.cpp
+  src/rtde/get_urcontrol_version.cpp
+  src/rtde/request_protocol_version.cpp
+  src/rtde/rtde_package.cpp
+  src/rtde/text_message.cpp
+  src/rtde/rtde_client.cpp
+  src/ur/ur_driver.cpp
+  src/ur/calibration_checker.cpp
+  src/ur/dashboard_client.cpp
+  src/ur/tool_communication.cpp
+  src/rtde/rtde_writer.cpp
+  src/default_log_handler.cpp
+  src/log.cpp
+)
+
+set (HEADER_FILES
+  include/ur_client_library/comm/bin_parser.h
+  include/ur_client_library/comm/control_mode.h
+  include/ur_client_library/comm/package_serializer.h
+  include/ur_client_library/comm/package.h
+  include/ur_client_library/comm/parser.h
+  include/ur_client_library/comm/pipeline.h
+  include/ur_client_library/comm/producer.h
+  include/ur_client_library/comm/shell_consumer.h
+  include/ur_client_library/comm/tcp_server.h
+  include/ur_client_library/comm/tcp_socket.h
+
+  include/ur_client_library/control/reverse_interface.h
+  include/ur_client_library/control/script_sender.h
+  include/ur_client_library/control/trajectory_point_interface.h
+
+  include/ur_client_library/primary/robot_message/version_message.h
+  include/ur_client_library/primary/robot_state/kinematics_info.h
+  include/ur_client_library/primary/abstract_primary_consumer.h
+  include/ur_client_library/primary/package_header.h
+  include/ur_client_library/primary/primary_package.h
+  include/ur_client_library/primary/primary_parser.h
+  include/ur_client_library/primary/robot_message.h
+  include/ur_client_library/primary/robot_State.h
+
+  include/ur_client_library/queue/atomicops.h
+  include/ur_client_library/queue/readerwriterqueue.h
+
+  include/ur_client_library/rtde/control_package_pause.h
+  include/ur_client_library/rtde/control_package_setup_inputs.h
+  include/ur_client_library/rtde/control_package_setup_outputs.h
+  include/ur_client_library/rtde/control_package_start.h
+  include/ur_client_library/rtde/data_package.h
+  include/ur_client_library/rtde/get_urcontrol_version.h
+  include/ur_client_library/rtde/package_header.h
+  include/ur_client_library/rtde/request_protocol_version.h
+  include/ur_client_library/rtde/rtde_client.h
+  include/ur_client_library/rtde/rtde_package.h
+  include/ur_client_library/rtde/rtde_parser.h
+  include/ur_client_library/rtde/rtde_writer.h
+  include/ur_client_library/rtde/text_message.h
+
+  include/ur_client_library/ur/calibration_checker.h
+  include/ur_client_library/ur/dashboard_client.h
+  include/ur_client_library/ur/datatypes.h
+  include/ur_client_library/ur/tool_communication.h
+  include/ur_client_library/ur/ur_driver.h
+  include/ur_client_library/ur/version_information.h
+
+  include/ur_client_library/default_log_handler.h
+  include/ur_client_library/exceptions.h
+  include/ur_client_library/log.h
+  include/ur_client_library/portable_endian.h
+  include/ur_client_library/types.h
+)
 
 add_library(urcl SHARED
-    src/comm/tcp_socket.cpp
-    src/comm/tcp_server.cpp
-    src/control/reverse_interface.cpp
-    src/control/script_sender.cpp
-    src/control/trajectory_point_interface.cpp
-    src/primary/primary_package.cpp
-    src/primary/robot_message.cpp
-    src/primary/robot_state.cpp
-    src/primary/robot_message/version_message.cpp
-    src/primary/robot_state/kinematics_info.cpp
-    src/rtde/control_package_pause.cpp
-    src/rtde/control_package_setup_inputs.cpp
-    src/rtde/control_package_setup_outputs.cpp
-    src/rtde/control_package_start.cpp
-    src/rtde/data_package.cpp
-    src/rtde/get_urcontrol_version.cpp
-    src/rtde/request_protocol_version.cpp
-    src/rtde/rtde_package.cpp
-    src/rtde/text_message.cpp
-    src/rtde/rtde_client.cpp
-    src/ur/ur_driver.cpp
-    src/ur/calibration_checker.cpp
-    src/ur/dashboard_client.cpp
-    src/ur/tool_communication.cpp
-    src/rtde/rtde_writer.cpp
-    src/default_log_handler.cpp
-    src/log.cpp
+  ${SOURCE_FILES} ${HEADER_FILES}
 )
+
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${SOURCE_FILES} ${HEADER_FILES})
+
 add_library(ur_client_library::urcl ALIAS urcl)
-target_compile_options(urcl PRIVATE -Wall -Wextra -Wno-unused-parameter)
+
+find_package(asio REQUIRED)
+target_link_libraries(urcl PUBLIC asio::asio)
+
+if (WIN32)
+else ()
+  target_compile_options(urcl PRIVATE -Wall -Wextra -Wno-unused-parameter)
+ENDIF ()
 target_compile_options(urcl PUBLIC ${CXX17_FLAG})
+
 target_include_directories( urcl PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 
-find_package(Threads REQUIRED)
-if(THREADS_HAVE_PTHREAD_ARG)
-  target_compile_options(urcl PUBLIC "-pthread")
-endif()
-if(CMAKE_THREAD_LIBS_INIT)
-  target_link_libraries(urcl PUBLIC "${CMAKE_THREAD_LIBS_INIT}")
-endif()
+
+if (WIN32)
+else ()
+  find_package(Threads REQUIRED)
+  if(THREADS_HAVE_PTHREAD_ARG)
+    target_compile_options(urcl PUBLIC "-pthread")
+  endif()
+  if(CMAKE_THREAD_LIBS_INIT)
+    target_link_libraries(urcl PUBLIC "${CMAKE_THREAD_LIBS_INIT}")
+  endif()
+endif ()
 
 ##
 ## Build testing if enabled by option
@@ -72,7 +155,10 @@ else()
 endif()
 
 
-add_subdirectory(examples)
+if (WIN32)
+else ()
+  add_subdirectory(examples)
+endif ()
 
 include(GNUInstallDirs)
 install(TARGETS urcl EXPORT urcl_targets

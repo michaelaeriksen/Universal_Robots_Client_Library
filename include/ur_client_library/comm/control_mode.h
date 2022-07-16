@@ -29,6 +29,8 @@
 #ifndef UR_CLIENT_LIBRARY_CONTROL_MODE_H_INCLUDED
 #define UR_CLIENT_LIBRARY_CONTROL_MODE_H_INCLUDED
 
+#include <cstdint>
+
 namespace urcl
 {
 namespace comm

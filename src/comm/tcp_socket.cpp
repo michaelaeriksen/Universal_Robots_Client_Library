@@ -20,16 +20,19 @@
  * limitations under the License.
  */
 
-#include <arpa/inet.h>
-#include <endian.h>
-#include <netinet/tcp.h>
-#include <unistd.h>
+#ifdef WIN32
+#else
+#  include <arpa/inet.h>
+#  include <netinet/tcp.h>
+#  include <unistd.h>
+#endif
 #include <cstring>
 #include <sstream>
 #include <thread>
 
 #include "ur_client_library/log.h"
 #include "ur_client_library/comm/tcp_socket.h"
+#include "ur_client_library/portable_endian.h"
 
 namespace urcl
 {
@@ -45,6 +48,8 @@ TCPSocket::~TCPSocket()
 
 void TCPSocket::setOptions(int socket_fd)
 {
+#if WIN32
+#else
   int flag = 1;
   setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(int));
   setsockopt(socket_fd, IPPROTO_TCP, TCP_QUICKACK, &flag, sizeof(int));
@@ -53,6 +58,7 @@ void TCPSocket::setOptions(int socket_fd)
   {
     setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, recv_timeout_.get(), sizeof(timeval));
   }
+#endif
 }
 
 bool TCPSocket::setup(std::string& host, int port)
@@ -117,7 +123,11 @@ void TCPSocket::close()
   if (socket_fd_ >= 0)
   {
     state_ = SocketState::Closed;
+#if WIN32
+    assert(false);
+#else
     ::close(socket_fd_);
+#endif
     socket_fd_ = -1;
   }
 }
@@ -155,7 +165,7 @@ bool TCPSocket::read(uint8_t* buf, const size_t buf_len, size_t& read)
   if (state_ != SocketState::Connected)
     return false;
 
-  ssize_t res = ::recv(socket_fd_, buf, buf_len, 0);
+  auto res = ::recv(socket_fd_, (char*)buf, buf_len, 0);
 
   if (res == 0)
   {
@@ -184,7 +194,7 @@ bool TCPSocket::write(const uint8_t* buf, const size_t buf_len, size_t& written)
   // handle partial sends
   while (written < buf_len)
   {
-    ssize_t sent = ::send(socket_fd_, buf + written, remaining, 0);
+    auto sent = ::send(socket_fd_, (const char*)buf + written, remaining, 0);
 
     if (sent <= 0)
     {
