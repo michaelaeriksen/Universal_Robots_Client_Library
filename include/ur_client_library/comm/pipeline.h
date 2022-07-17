@@ -353,9 +353,9 @@ private:
   void runProducer()
   {
     URCL_LOG_DEBUG("Starting up producer");
-    std::ifstream realtime_file("/sys/kernel/realtime", std::ios::in);
-    bool has_realtime;
-    realtime_file >> has_realtime;
+    //std::ifstream realtime_file("/sys/kernel/realtime", std::ios::in);
+    bool has_realtime = false;
+    //realtime_file >> has_realtime;
     if (has_realtime)
     {
       assert(false);

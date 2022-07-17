@@ -49,6 +49,15 @@ TCPSocket::~TCPSocket()
 void TCPSocket::setOptions(int socket_fd)
 {
 #if WIN32
+  BOOL bOptionValue = TRUE;
+  setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, (char*)&bOptionValue, sizeof(bOptionValue));
+  //setsockopt(socket_fd, IPPROTO_TCP, TCP_QUICKACK, &flag, sizeof(int));
+
+  if (recv_timeout_ != nullptr)
+  {
+    int sec = recv_timeout_->tv_sec * 1000;
+    setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, (char*)&sec /* recv_timeout_.get()*/, sizeof(int));
+  }
 #else
   int flag = 1;
   setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(int));
@@ -124,7 +133,7 @@ void TCPSocket::close()
   {
     state_ = SocketState::Closed;
 #if WIN32
-    assert(false);
+    ::closesocket(socket_fd_);
 #else
     ::close(socket_fd_);
 #endif

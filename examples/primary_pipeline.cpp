@@ -25,6 +25,8 @@
  */
 //----------------------------------------------------------------------
 
+#include <asio.hpp>
+
 #include <ur_client_library/comm/pipeline.h>
 #include <ur_client_library/comm/producer.h>
 #include <ur_client_library/comm/shell_consumer.h>

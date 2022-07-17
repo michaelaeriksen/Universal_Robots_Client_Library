@@ -28,6 +28,8 @@
  */
 //----------------------------------------------------------------------
 
+#include <asio.hpp>
+
 #include <ur_client_library/ur/ur_driver.h>
 #include <ur_client_library/types.h>
 

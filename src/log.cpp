@@ -40,7 +40,7 @@ class Logger
 public:
   Logger()
   {
-    log_level_ = LogLevel::Warn;
+    log_level_ = LogLevel::Debug;
     log_handler_.reset(new DefaultLogHandler());
   }
 

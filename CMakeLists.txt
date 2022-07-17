@@ -155,10 +155,8 @@ else()
 endif()
 
 
-if (WIN32)
-else ()
-  add_subdirectory(examples)
-endif ()
+add_subdirectory(examples)
+
 
 include(GNUInstallDirs)
 install(TARGETS urcl EXPORT urcl_targets
