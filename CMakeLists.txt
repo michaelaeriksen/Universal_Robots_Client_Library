@@ -75,7 +75,7 @@ set (HEADER_FILES
   include/ur_client_library/primary/primary_package.h
   include/ur_client_library/primary/primary_parser.h
   include/ur_client_library/primary/robot_message.h
-  include/ur_client_library/primary/robot_State.h
+  include/ur_client_library/primary/robot_state.h
 
   include/ur_client_library/queue/atomicops.h
   include/ur_client_library/queue/readerwriterqueue.h
