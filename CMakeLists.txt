@@ -108,11 +108,11 @@ set (HEADER_FILES
   include/ur_client_library/types.h
 )
 
-add_library(urcl SHARED
+add_library(urcl STATIC
   ${SOURCE_FILES} ${HEADER_FILES}
 )
 
-set_target_properties(urcl PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS true)
+#set_target_properties(urcl PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS true)
 
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${SOURCE_FILES} ${HEADER_FILES})
 
