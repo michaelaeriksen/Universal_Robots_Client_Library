@@ -33,7 +33,7 @@
 #include "ur_client_library/rtde/rtde_package.h"
 #include "ur_client_library/rtde/data_package.h"
 #include "ur_client_library/comm/stream.h"
-#include "ur_client_library/queue/readerwriterqueue.h"
+#include "readerwriterqueue/readerwriterqueue.h"
 #include <thread>
 #include <mutex>
 

@@ -22,7 +22,7 @@
 
 #include "ur_client_library/comm/package.h"
 #include "ur_client_library/log.h"
-#include "ur_client_library/queue/readerwriterqueue.h"
+#include "readerwriterqueue/readerwriterqueue.h"
 #include <atomic>
 #include <chrono>
 #include <thread>
@@ -332,13 +332,13 @@ public:
   {
     // If the queue has more than one package, get the latest one.
     bool res = false;
-    while (queue_.tryDequeue(product))
+    while (queue_.try_emplace(std::move(product)))
     {
       res = true;
     }
 
     // If the queue is empty, wait for a package.
-    return res || queue_.waitDequeTimed(product, timeout);
+    return res || queue_.wait_dequeue_timed(product, timeout);
   }
 
 private:
@@ -418,7 +418,7 @@ private:
 
       for (auto& p : products)
       {
-        if (!queue_.tryEnqueue(std::move(p)))
+        if (!queue_.try_emplace(std::move(p)))
         {
           URCL_LOG_ERROR("Pipeline producer overflowed! <%s>", name_.c_str());
         }
@@ -439,7 +439,7 @@ private:
       // at roughly 125hz (every 8ms) and have to update
       // the controllers (i.e. the consumer) with *at least* 125Hz
       // So we update the consumer more frequently via onTimeout
-      if (!queue_.waitDequeTimed(product, std::chrono::milliseconds(8)))
+      if (!queue_.wait_dequeue_timed(product, std::chrono::milliseconds(8)))
       {
         consumer_->onTimeout();
         continue;

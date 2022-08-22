@@ -35,17 +35,17 @@ namespace control
 {
 ReverseInterface::ReverseInterface(uint32_t port, std::function<void(bool)> handle_program_state)
   : client_fd_(-1)
-  //, server_(port)
+  , server_(port)
   , handle_program_state_(handle_program_state)
   , keepalive_count_(1)
 {
   handle_program_state_(false);
-  //server_.setMessageCallback(std::bind(&ReverseInterface::messageCallback, this, std::placeholders::_1,
-  //                                     std::placeholders::_2, std::placeholders::_3));
-  //server_.setConnectCallback(std::bind(&ReverseInterface::connectionCallback, this, std::placeholders::_1));
-  //server_.setDisconnectCallback(std::bind(&ReverseInterface::disconnectionCallback, this, std::placeholders::_1));
-  //server_.setMaxClientsAllowed(1);
-  //server_.start();
+  server_.setMessageCallback(std::bind(&ReverseInterface::messageCallback, this, std::placeholders::_1,
+                                       std::placeholders::_2, std::placeholders::_3));
+  server_.setConnectCallback(std::bind(&ReverseInterface::connectionCallback, this, std::placeholders::_1));
+  server_.setDisconnectCallback(std::bind(&ReverseInterface::disconnectionCallback, this, std::placeholders::_1));
+  server_.setMaxClientsAllowed(1);
+  server_.start();
 }
 
 bool ReverseInterface::write(const vector6d_t* positions, const comm::ControlMode control_mode)
@@ -79,10 +79,7 @@ bool ReverseInterface::write(const vector6d_t* positions, const comm::ControlMod
   b_pos += append(b_pos, val);
 
   size_t written;
-
-  assert(false);
-  return 0;
-  //return server_.write(client_fd_, buffer, sizeof(buffer), written);
+  return server_.write(client_fd_, buffer, sizeof(buffer), written);
 }
 
 bool ReverseInterface::writeTrajectoryControlMessage(const TrajectoryControlMessage trajectory_action,
@@ -116,10 +113,7 @@ bool ReverseInterface::writeTrajectoryControlMessage(const TrajectoryControlMess
   b_pos += append(b_pos, val);
 
   size_t written;
-
-  assert(false);
-  return 0;
-  //return server_.write(client_fd_, buffer, sizeof(buffer), written);
+  return server_.write(client_fd_, buffer, sizeof(buffer), written);
 }
 
 void ReverseInterface::connectionCallback(const int filedescriptor)

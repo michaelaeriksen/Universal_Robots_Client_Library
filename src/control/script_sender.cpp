@@ -34,16 +34,15 @@ namespace urcl
 namespace control
 {
 ScriptSender::ScriptSender(uint32_t port, const std::string& program)
-  : /* server_(port)
-  ,*/ script_thread_()
+  : server_(port)
+  , script_thread_()
   , program_(program)
 {
-  assert(false);
-  //server_.setMessageCallback(
-  //    std::bind(&ScriptSender::messageCallback, this, std::placeholders::_1, std::placeholders::_2));
-  //server_.setConnectCallback(std::bind(&ScriptSender::connectionCallback, this, std::placeholders::_1));
-  //server_.setDisconnectCallback(std::bind(&ScriptSender::disconnectionCallback, this, std::placeholders::_1));
-  //server_.start();
+  server_.setMessageCallback(
+      std::bind(&ScriptSender::messageCallback, this, std::placeholders::_1, std::placeholders::_2));
+  server_.setConnectCallback(std::bind(&ScriptSender::connectionCallback, this, std::placeholders::_1));
+  server_.setDisconnectCallback(std::bind(&ScriptSender::disconnectionCallback, this, std::placeholders::_1));
+  server_.start();
 }
 
 void ScriptSender::connectionCallback(const int filedescriptor)
@@ -71,16 +70,14 @@ void ScriptSender::sendProgram(const int filedescriptor)
   const uint8_t* data = reinterpret_cast<const uint8_t*>(program_.c_str());
   size_t written;
 
-  assert(false);
-
-  //if (server_.write(filedescriptor, data, len, written))
-  //{
-  //  URCL_LOG_INFO("Sent program to robot");
-  //}
-  //else
-  //{
-  //  URCL_LOG_ERROR("Could not send program to robot");
-  //}
+  if (server_.write(filedescriptor, data, len, written))
+  {
+    URCL_LOG_INFO("Sent program to robot");
+  }
+  else
+  {
+    URCL_LOG_ERROR("Could not send program to robot");
+  }
 }
 
 }  // namespace control

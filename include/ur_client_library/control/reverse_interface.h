@@ -115,7 +115,7 @@ protected:
   virtual void messageCallback(const int filedescriptor, char* buffer, int nbytesrecv);
 
   int client_fd_;
-  //comm::TCPServer server_;
+  comm::TCPServer server_;
 
   template <typename T>
   size_t append(uint8_t* buffer, T& val)

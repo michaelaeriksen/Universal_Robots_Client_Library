@@ -77,9 +77,6 @@ set (HEADER_FILES
   include/ur_client_library/primary/robot_message.h
   include/ur_client_library/primary/robot_state.h
 
-  include/ur_client_library/queue/atomicops.h
-  include/ur_client_library/queue/readerwriterqueue.h
-
   include/ur_client_library/rtde/control_package_pause.h
   include/ur_client_library/rtde/control_package_setup_inputs.h
   include/ur_client_library/rtde/control_package_setup_outputs.h
@@ -121,10 +118,17 @@ add_library(ur_client_library::urcl ALIAS urcl)
 find_package(asio REQUIRED)
 target_link_libraries(urcl PUBLIC asio::asio)
 
-if (WIN32)
-else ()
-  target_compile_options(urcl PRIVATE -Wall -Wextra -Wno-unused-parameter)
-ENDIF ()
+find_path(READERWRITERQUEUE_INCLUDE_DIRS "readerwriterqueue/atomicops.h")
+target_include_directories(urcl PUBLIC ${READERWRITERQUEUE_INCLUDE_DIRS})
+
+set_target_properties(urcl PROPERTIES CXX_STANDARD 20) 
+#set_target_properties(urcl PROPERTIES UNITY_BUILD ON)
+
+target_compile_options(urcl PRIVATE
+	$<$<CXX_COMPILER_ID:MSVC>:/W4 /MP /permissive- /bigobj>
+	$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wno-unused-parameter>
+)
+
 target_compile_options(urcl PUBLIC ${CXX17_FLAG})
 
 target_include_directories( urcl PUBLIC
