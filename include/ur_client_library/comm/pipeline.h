@@ -332,7 +332,7 @@ public:
   {
     // If the queue has more than one package, get the latest one.
     bool res = false;
-    while (queue_.try_emplace(std::move(product)))
+    while (queue_.try_dequeue(product))
     {
       res = true;
     }
