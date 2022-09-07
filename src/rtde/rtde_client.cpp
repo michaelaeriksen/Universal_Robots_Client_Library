@@ -383,7 +383,15 @@ void RTDEClient::setupInputs()
 void RTDEClient::disconnect()
 {
   // If communication is started it should be paused before disconnecting
-  sendPause();
+  try
+  {
+    sendPause();
+  }
+  catch (const UrException& rError)
+  {
+    // Eat exception, it's bad practice to throw in destructor
+    URCL_LOG_ERROR("%s", rError.what());
+  }
   pipeline_.stop();
   stream_.disconnect();
   client_state_ = ClientState::UNINITIALIZED;
