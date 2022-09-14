@@ -79,7 +79,7 @@ std::string DashboardClient::read()
       disconnect();
       throw TimeoutException("Did not receive answer from dashboard server in time. Disconnecting from dashboard "
                              "server.",
-                             *recv_timeout_);
+                             recv_timeout_);
     }
     result << character;
     if (character == '\n')

@@ -110,10 +110,10 @@ class TimeoutException : public UrException
 {
 public:
   explicit TimeoutException() = delete;
-  explicit TimeoutException(const std::string& text, timeval timeout) : std::runtime_error(text)
+  explicit TimeoutException(const std::string& text, std::chrono::milliseconds timeout) : std::runtime_error(text)
   {
     std::stringstream ss;
-    ss << text << "(Configured timeout: " << timeout.tv_sec + timeout.tv_usec * 1e-6 << " sec)";
+    ss << text << "(Configured timeout: " << timeout.count() << " milliseconds)";
     text_ = ss.str();
   }
   virtual const char* what() const noexcept override

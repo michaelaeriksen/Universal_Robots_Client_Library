@@ -31,6 +31,7 @@
 #include <mutex>
 #include <string>
 #include <memory>
+#include <chrono>
 
 namespace urcl
 {
@@ -65,7 +66,8 @@ protected:
 
   bool setup(std::string& host, int port);
 
-  std::unique_ptr<timeval> recv_timeout_;
+  std::chrono::milliseconds recv_timeout_;
+  //std::unique_ptr<timeval> recv_timeout_;
 
 public:
   /*!
@@ -142,7 +144,7 @@ public:
    *
    * \param timeout Timeout used for setting things up
    */
-  void setReceiveTimeout(const timeval& timeout);
+  void setReceiveTimeout(const std::chrono::milliseconds& timeout);
 };
 }  // namespace comm
 }  // namespace urcl

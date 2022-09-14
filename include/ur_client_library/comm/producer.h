@@ -62,10 +62,7 @@ public:
    */
   void setupProducer() override
   {
-    timeval tv;
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
-    stream_.setReceiveTimeout(tv);
+    stream_.setReceiveTimeout(std::chrono::seconds(1));
     if (!stream_.connect())
     {
       throw UrException("Failed to connect to robot. Please check if the robot is booted and connected.");

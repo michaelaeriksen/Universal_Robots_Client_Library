@@ -53,11 +53,8 @@ void TCPSocket::setOptions(int socket_fd)
   setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, (char*)&bOptionValue, sizeof(bOptionValue));
   //setsockopt(socket_fd, IPPROTO_TCP, TCP_QUICKACK, &flag, sizeof(int));
 
-  if (recv_timeout_ != nullptr)
-  {
-    int sec = recv_timeout_->tv_sec * 1000;
-    setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, (char*)&sec /* recv_timeout_.get()*/, sizeof(int));
-  }
+  const int timeout = recv_timeout_.count();
+  setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(int));
 #else
   int flag = 1;
   setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(int));
@@ -218,9 +215,9 @@ bool TCPSocket::write(const uint8_t* buf, const size_t buf_len, size_t& written)
   return true;
 }
 
-void TCPSocket::setReceiveTimeout(const timeval& timeout)
+void TCPSocket::setReceiveTimeout(const std::chrono::milliseconds& timeout)
 {
-  recv_timeout_.reset(new timeval(timeout));
+  recv_timeout_ = timeout;
 
   if (state_ == SocketState::Connected)
   {
