@@ -51,10 +51,7 @@ bool DashboardClient::connect()
     ret_val = true;
   }
 
-  timeval tv;
-  tv.tv_sec = 1;
-  tv.tv_usec = 0;
-  TCPSocket::setReceiveTimeout(tv);
+  TCPSocket::setReceiveTimeout(std::chrono::seconds(1));
 
   return ret_val;
 }
