@@ -30,6 +30,8 @@
 #define UR_CLIENT_LIBRARY_TCP_SERVER_H_INCLUDED
 
 #if WIN32
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
 #else
 #  include <netdb.h>
 #  include <sys/socket.h>
@@ -174,8 +176,8 @@ private:
   int port_;
 
   int maxfd_;
-  //fd_set masterfds_;
-  //fd_set tempfds_;
+  fd_set masterfds_;
+  fd_set tempfds_;
 
   uint32_t max_clients_allowed_;
   std::vector<int> client_fds_;

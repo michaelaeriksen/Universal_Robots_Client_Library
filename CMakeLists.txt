@@ -125,6 +125,8 @@ target_include_directories(urcl PUBLIC ${READERWRITERQUEUE_INCLUDE_DIRS})
 set_target_properties(urcl PROPERTIES CXX_STANDARD 20) 
 #set_target_properties(urcl PROPERTIES UNITY_BUILD ON)
 
+target_compile_definitions(urcl PUBLIC $<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>)
+
 target_compile_options(urcl PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:/W4 /MP /permissive- /bigobj>
 	$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wno-unused-parameter>
