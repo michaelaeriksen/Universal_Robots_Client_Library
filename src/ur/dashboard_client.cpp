@@ -31,6 +31,8 @@
 #include <ur_client_library/ur/dashboard_client.h>
 #include <ur_client_library/exceptions.h>
 
+#undef ERROR
+
 namespace urcl
 {
 DashboardClient::DashboardClient(const std::string& host) : host_(host), port_(DASHBOARD_SERVER_PORT)

@@ -39,7 +39,10 @@
 #include <system_error>
 #include <cassert>
 
-#define close closesocket
+#ifdef WIN32
+#  undef ERROR
+#  define close closesocket
+#endif
 
 namespace urcl
 {

@@ -34,6 +34,8 @@
 #include "ur_client_library/comm/tcp_socket.h"
 #include "ur_client_library/portable_endian.h"
 
+#undef ERROR
+
 namespace urcl
 {
 namespace comm

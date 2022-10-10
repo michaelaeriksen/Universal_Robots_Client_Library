@@ -39,19 +39,19 @@ void DefaultLogHandler::log(const char* file, int line, LogLevel loglevel, const
 {
   switch (loglevel)
   {
-    case LogLevel::Info:
+    case LogLevel::INFO:
       printf("%s%s %i: %s \n", "INFO ", file, line, log);
       break;
-    case LogLevel::Debug:
+    case LogLevel::DEBUG:
       printf("%s%s %i: %s \n", "DEBUG ", file, line, log);
       break;
-    case LogLevel::Warn:
+    case LogLevel::WARN:
       printf("%s%s %i: %s \n", "WARN ", file, line, log);
       break;
-    case LogLevel::Error:
+    case LogLevel::ERROR:
       printf("%s%s %i: %s \n", "ERROR ", file, line, log);
       break;
-    case LogLevel::Fatal:
+    case LogLevel::FATAL:
       printf("%s%s %i: %s \n", "FATAL ", file, line, log);
       break;
     default:

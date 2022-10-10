@@ -20,14 +20,16 @@
 
 #pragma once
 
-#include "ur_client_library/comm/package.h"
-#include "ur_client_library/log.h"
-#include "readerwriterqueue/readerwriterqueue.h"
 #include <atomic>
 #include <chrono>
 #include <thread>
 #include <vector>
 #include <fstream>
+#include "readerwriterqueue/readerwriterqueue.h"
+#include "ur_client_library/comm/package.h"
+#include "ur_client_library/log.h"
+
+#undef ERROR
 
 namespace urcl
 {
