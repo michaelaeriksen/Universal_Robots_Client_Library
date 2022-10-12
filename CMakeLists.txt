@@ -23,6 +23,10 @@ else ()
 endif ()
 
 set (SOURCE_FILES
+  src/comm/Server.cpp
+  src/comm/SocketConnection.cpp
+  src/comm/SocketListener.cpp
+  src/comm/SocketServer.cpp
   src/comm/tcp_socket.cpp
   src/comm/tcp_server.cpp
   src/control/reverse_interface.cpp
@@ -56,16 +60,22 @@ set (SOURCE_FILES
 set (HEADER_FILES
   include/ur_client_library/comm/bin_parser.h
   include/ur_client_library/comm/control_mode.h
-  include/ur_client_library/comm/package_serializer.h
   include/ur_client_library/comm/package.h
+  include/ur_client_library/comm/package_serializer.h
   include/ur_client_library/comm/parser.h
   include/ur_client_library/comm/pipeline.h
   include/ur_client_library/comm/producer.h
+  include/ur_client_library/comm/Server.h
   include/ur_client_library/comm/shell_consumer.h
+  include/ur_client_library/comm/SocketConnection.h
+  include/ur_client_library/comm/SocketListener.h
+  include/ur_client_library/comm/SocketServer.h
+  include/ur_client_library/comm/stream.h
   include/ur_client_library/comm/tcp_server.h
   include/ur_client_library/comm/tcp_socket.h
 
   include/ur_client_library/control/reverse_interface.h
+  include/ur_client_library/control/script_command_interface.h
   include/ur_client_library/control/script_sender.h
   include/ur_client_library/control/trajectory_point_interface.h
 

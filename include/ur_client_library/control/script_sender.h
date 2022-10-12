@@ -33,7 +33,8 @@
 #include <thread>
 #include <string>
 
-#include "ur_client_library/comm/tcp_server.h"
+//#include "ur_client_library/comm/tcp_server.h"
+#include "ur_client_library/comm/Server.h"
 #include "ur_client_library/log.h"
 
 namespace urcl
@@ -57,7 +58,8 @@ public:
   ScriptSender(uint32_t port, const std::string& program);
 
 private:
-  comm::TCPServer server_;
+  //comm::TCPServer server_;
+  comm::Server server_;
   std::thread script_thread_;
   std::string program_;
 
