@@ -24,6 +24,8 @@
 #include <memory>
 #include <thread>
 
+#undef ERROR
+
 using namespace urcl;
 
 // In a real-world example it would be better to get those values from command line parameters / a

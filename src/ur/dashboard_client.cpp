@@ -29,10 +29,12 @@
 #include <iostream>
 #include <regex>
 #include <thread>
-#include <unistd.h>
+//#include <unistd.h>
 #include <ur_client_library/log.h>
 #include <ur_client_library/ur/dashboard_client.h>
 #include <ur_client_library/exceptions.h>
+
+using namespace std::literals;
 
 #undef ERROR
 
@@ -56,14 +58,10 @@ bool DashboardClient::connect()
   }
   bool ret_val = false;
 
-  timeval tv;
-
   while (not ret_val)
   {
     // The first read after connection can take more time.
-    tv.tv_sec = 10;
-    tv.tv_usec = 0;
-    TCPSocket::setReceiveTimeout(tv);
+    TCPSocket::setReceiveTimeout(std::chrono::seconds(10));
     try
     {
       if (TCPSocket::setup(host_, port_))
@@ -440,26 +438,18 @@ bool DashboardClient::commandGetUserRole(std::string& user_role)
 bool DashboardClient::commandGenerateFlightReport(const std::string& report_type)
 {
   assertVersion("5.8.0", "3.13", "generate flight report");
-  timeval tv;
-  tv.tv_sec = 180;
-  tv.tv_usec = 0;
-  TCPSocket::setReceiveTimeout(tv);  // Set timeout to 3 minutes as this command can take a long time to complete
+  TCPSocket::setReceiveTimeout(180s);  // Set timeout to 3 minutes as this command can take a long time to complete
   bool ret = sendRequest("generate flight report " + report_type, "(?:Flight Report generated with id:).*");
-  tv.tv_sec = 1;  // Reset timeout to standard timeout
-  TCPSocket::setReceiveTimeout(tv);
+  TCPSocket::setReceiveTimeout(1s); // Reset timeout to standard timeout
   return ret;
 }
 
 bool DashboardClient::commandGenerateSupportFile(const std::string& dir_path)
 {
   assertVersion("5.8.0", "3.13", "generate support file");
-  timeval tv;
-  tv.tv_sec = 600;
-  tv.tv_usec = 0;
-  TCPSocket::setReceiveTimeout(tv);  // Set timeout to 10 minutes as this command can take a long time to complete
+  TCPSocket::setReceiveTimeout(600s);  // Set timeout to 10 minutes as this command can take a long time to complete
   bool ret = sendRequest("generate support file " + dir_path, "(?:Completed successfully:).*");
-  tv.tv_sec = 1;  // Reset timeout to standard timeout
-  TCPSocket::setReceiveTimeout(tv);
+  TCPSocket::setReceiveTimeout(1s);  // Reset timeout to standard timeout
   return ret;
 }
 

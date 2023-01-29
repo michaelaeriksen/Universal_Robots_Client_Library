@@ -27,17 +27,21 @@ set (SOURCE_FILES
   src/comm/SocketConnection.cpp
   src/comm/SocketListener.cpp
   src/comm/SocketServer.cpp
-  src/comm/tcp_socket.cpp
   src/comm/tcp_server.cpp
+  src/comm/tcp_socket.cpp
+  
   src/control/reverse_interface.cpp
   src/control/script_command_interface.cpp
   src/control/script_sender.cpp
   src/control/trajectory_point_interface.cpp
+
+  src/primary/robot_message/version_message.cpp
+  src/primary/robot_state/kinematics_info.cpp
+
   src/primary/primary_package.cpp
   src/primary/robot_message.cpp
   src/primary/robot_state.cpp
-  src/primary/robot_message/version_message.cpp
-  src/primary/robot_state/kinematics_info.cpp
+
   src/rtde/control_package_pause.cpp
   src/rtde/control_package_setup_inputs.cpp
   src/rtde/control_package_setup_outputs.cpp
@@ -45,14 +49,17 @@ set (SOURCE_FILES
   src/rtde/data_package.cpp
   src/rtde/get_urcontrol_version.cpp
   src/rtde/request_protocol_version.cpp
-  src/rtde/rtde_package.cpp
-  src/rtde/text_message.cpp
   src/rtde/rtde_client.cpp
-  src/ur/ur_driver.cpp
+  src/rtde/rtde_package.cpp
+  src/rtde/rtde_writer.cpp
+  src/rtde/text_message.cpp
+
   src/ur/calibration_checker.cpp
   src/ur/dashboard_client.cpp
   src/ur/tool_communication.cpp
-  src/rtde/rtde_writer.cpp
+  src/ur/ur_driver.cpp
+  src/ur/version_information.cpp
+
   src/default_log_handler.cpp
   src/log.cpp
 )
