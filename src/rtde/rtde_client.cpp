@@ -58,7 +58,7 @@ RTDEClient::~RTDEClient()
   disconnect();
 }
 
-bool RTDEClient::init()
+bool RTDEClient::init(size_t max_num_tries, std::chrono::milliseconds reconnection_time)
 {
   if (client_state_ > ClientState::UNINITIALIZED)
   {
@@ -68,7 +68,7 @@ bool RTDEClient::init()
   unsigned int attempts = 0;
   while (attempts < MAX_INITIALIZE_ATTEMPTS)
   {
-    setupCommunication();
+    setupCommunication(max_num_tries, reconnection_time);
     if (client_state_ == ClientState::INITIALIZED)
       return true;
 
@@ -81,11 +81,11 @@ bool RTDEClient::init()
   throw UrException(ss.str());
 }
 
-void RTDEClient::setupCommunication()
+void RTDEClient::setupCommunication(size_t max_num_tries, std::chrono::milliseconds reconnection_time)
 {
   client_state_ = ClientState::INITIALIZING;
   // A running pipeline is needed inside setup
-  pipeline_.init();
+  pipeline_.init(max_num_tries, reconnection_time);
   pipeline_.run();
 
   uint16_t protocol_version = MAX_RTDE_PROTOCOL_VERSION;

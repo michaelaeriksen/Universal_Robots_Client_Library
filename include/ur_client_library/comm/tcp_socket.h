@@ -56,7 +56,7 @@ class TCPSocket
 private:
   std::atomic<int> socket_fd_;
   std::atomic<SocketState> state_;
-  std::chrono::seconds reconnection_time_;
+  std::chrono::milliseconds reconnection_time_;
 
 protected:
   virtual bool open(int socket_fd, struct sockaddr* address, size_t address_len)
@@ -65,7 +65,7 @@ protected:
   }
   virtual void setOptions(int socket_fd);
 
-  bool setup(std::string& host, int port);
+  bool setup(std::string& host, int port, size_t max_num_tries = 0);
 
   std::chrono::milliseconds recv_timeout_;
   //std::unique_ptr<timeval> recv_timeout_;
@@ -153,7 +153,7 @@ public:
    *
    * \param reconnection_time time in between connection attempts to the server
    */
-  void setReconnectionTime(std::chrono::seconds reconnection_time)
+  void setReconnectionTime(std::chrono::milliseconds reconnection_time)
   {
     reconnection_time_ = reconnection_time;
   }

@@ -60,10 +60,11 @@ public:
   /*!
    * \brief Triggers the stream to connect to the robot.
    */
-  void setupProducer() override
+  void setupProducer(size_t max_num_tries = 0, std::chrono::milliseconds reconnection_time = std::chrono::seconds(10)) override
   {
+    stream_.setReconnectionTime(reconnection_time);
     stream_.setReceiveTimeout(std::chrono::seconds(1));
-    if (!stream_.connect())
+    if (!stream_.connect(max_num_tries))
     {
       throw UrException("Failed to connect to robot. Please check if the robot is booted and connected.");
     }
