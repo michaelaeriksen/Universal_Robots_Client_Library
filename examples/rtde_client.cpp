@@ -37,9 +37,9 @@ using namespace urcl;
 
 // In a real-world example it would be better to get those values from command line parameters / a better configuration
 // system such as Boost.Program_options
-const std::string DEFAULT_ROBOT_IP = "127.0.0.1"; //192.168.56.101 ";
-const std::string OUTPUT_RECIPE = "E:/work/coco/src/universal-robots/Universal_Robots_Client_Library/examples/resources/rtde_output_recipe.txt";
-const std::string INPUT_RECIPE = "E:/work/coco/src/universal-robots/Universal_Robots_Client_Library/examples/resources/rtde_input_recipe.txt";
+const std::string DEFAULT_ROBOT_IP = "192.168.56.101";
+const std::string OUTPUT_RECIPE = "examples/resources/rtde_output_recipe.txt";
+const std::string INPUT_RECIPE = "examples/resources/rtde_input_recipe.txt";
 const std::chrono::milliseconds READ_TIMEOUT{ 100 };
 
 int main(int argc, char* argv[])
