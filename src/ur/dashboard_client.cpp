@@ -49,7 +49,7 @@ void DashboardClient::rtrim(std::string& str, const std::string& chars)
   str.erase(str.find_last_not_of(chars) + 1);
 }
 
-bool DashboardClient::connect()
+bool DashboardClient::connect(size_t max_num_tries, std::chrono::milliseconds reconnection_time)
 {
   if (getState() == comm::SocketState::Connected)
   {
@@ -61,13 +61,18 @@ bool DashboardClient::connect()
   while (not ret_val)
   {
     // The first read after connection can take more time.
+    TCPSocket::setReconnectionTime(reconnection_time);
     TCPSocket::setReceiveTimeout(std::chrono::seconds(10));
     try
     {
-      if (TCPSocket::setup(host_, port_))
+      if (TCPSocket::setup(host_, port_, max_num_tries))
       {
         URCL_LOG_INFO("%s", read().c_str());
         ret_val = true;
+      }
+      else
+      {
+        return false;
       }
     }
     catch (const TimeoutException&)
