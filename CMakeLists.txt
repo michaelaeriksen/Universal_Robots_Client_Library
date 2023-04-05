@@ -8,20 +8,6 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
-
-if (WIN32)
-  if(NOT CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 17)
-  endif()
-else ()
-  ##
-  ## Check C++11 support / enable global pedantic and Wall
-  ##
-  include(DefineCXX17CompilerFlag)
-  DEFINE_CXX_17_COMPILER_FLAG(CXX17_FLAG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
-endif ()
-
 set (SOURCE_FILES
   src/comm/Server.cpp
   src/comm/SocketConnection.cpp
@@ -149,9 +135,7 @@ target_compile_options(urcl PRIVATE
 	$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wno-unused-parameter>
 )
 
-target_compile_options(urcl PUBLIC ${CXX17_FLAG})
-
-target_include_directories( urcl PUBLIC
+target_include_directories(urcl PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
