@@ -335,5 +335,20 @@ bool RTDEWriter::sendInputDoubleRegister(uint32_t register_id, double value)
   return success;
 }
 
+bool RTDEWriter::sendExternalForceTorque(const vector6d_t& value)
+{
+  std::lock_guard<std::mutex> guard(package_mutex_);
+  bool success = true;
+  success = package_.setData("external_force_torque", value);
+  if (success)
+  {
+    if (!queue_.try_emplace(std::unique_ptr<DataPackage>(new DataPackage(package_))))
+    {
+      return false;
+    }
+  }
+  return success;
+}
+
 }  // namespace rtde_interface
 }  // namespace urcl
