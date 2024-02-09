@@ -25,8 +25,6 @@
  */
 //----------------------------------------------------------------------
 
-#include <cassert>
-
 #include <ur_client_library/control/script_sender.h>
 
 namespace urcl
@@ -34,9 +32,7 @@ namespace urcl
 namespace control
 {
 ScriptSender::ScriptSender(uint32_t port, const std::string& program)
-  : server_(port)
-  , script_thread_()
-  , program_(program)
+  : server_(port), script_thread_(), program_(program)
 {
   server_.setMessageCallback(
       std::bind(&ScriptSender::messageCallback, this, std::placeholders::_1, std::placeholders::_2));

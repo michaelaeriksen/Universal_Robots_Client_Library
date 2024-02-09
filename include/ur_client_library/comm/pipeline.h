@@ -25,9 +25,13 @@
 #include <thread>
 #include <vector>
 #include <fstream>
+#include <mutex>
+#include <algorithm>
+
 #include "readerwriterqueue/readerwriterqueue.h"
 #include "ur_client_library/comm/package.h"
 #include "ur_client_library/log.h"
+#include "ur_client_library/helpers.h"
 
 #undef ERROR
 
@@ -90,7 +94,7 @@ template <typename T>
 class MultiConsumer : public IConsumer<T>
 {
 private:
-  std::vector<IConsumer<T>*> consumers_;
+  std::vector<std::shared_ptr<IConsumer<T>>> consumers_;
 
 public:
   /*!
@@ -98,8 +102,36 @@ public:
    *
    * \param consumers The list of consumers that should all consume given products
    */
-  MultiConsumer(std::vector<IConsumer<T>*> consumers) : consumers_(consumers)
+  MultiConsumer(std::vector<std::shared_ptr<IConsumer<T>>> consumers) : consumers_(consumers)
   {
+  }
+
+  /*!
+   * \brief Adds a new consumer to the list of consumers
+   *
+   * \param consumer Consumer that should be added to the list
+   */
+  void addConsumer(std::shared_ptr<IConsumer<T>> consumer)
+  {
+    std::lock_guard<std::mutex> lk(consumer_list);
+    consumers_.push_back(consumer);
+  }
+
+  /*!
+   * \brief Remove a consumer from the list of consumers
+   *
+   * \param consumer Consumer that should be removed from the list
+   */
+  void removeConsumer(std::shared_ptr<IConsumer<T>> consumer)
+  {
+    std::lock_guard<std::mutex> lk(consumer_list);
+    auto it = std::find(consumers_.begin(), consumers_.end(), consumer);
+    if (it == consumers_.end())
+    {
+      URCL_LOG_ERROR("Unable to remove consumer as it is not part of the consumer list");
+      return;
+    }
+    consumers_.erase(it);
   }
 
   /*!
@@ -152,6 +184,7 @@ public:
    */
   bool consume(std::shared_ptr<T> product)
   {
+    std::lock_guard<std::mutex> lk(consumer_list);
     bool res = true;
     for (auto& con : consumers_)
     {
@@ -160,6 +193,9 @@ public:
     }
     return res;
   }
+
+private:
+  std::mutex consumer_list;
 };
 
 /*!
@@ -173,8 +209,13 @@ class IProducer
 public:
   /*!
    * \brief Set-up functionality of the producers.
+   *
+   * \param max_num_tries Maximum number of connection attempts before counting the connection as
+   * failed. Unlimited number of attempts when set to 0.
+   * \param reconnection_time time in between connection attempts to the server
    */
-  virtual void setupProducer(size_t max_num_tries = 0, std::chrono::milliseconds reconnection_time = std::chrono::seconds(10))
+  virtual void setupProducer(const size_t max_num_tries = 0,
+                             const std::chrono::milliseconds reconnection_time = std::chrono::seconds(10))
   {
   }
   /*!
@@ -246,9 +287,17 @@ public:
    * \param consumer The consumer to run in the pipeline
    * \param name The pipeline's name
    * \param notifier The notifier to use
+   * \param producer_fifo_scheduling Should the producer thread use FIFO scheduling?
    */
-  Pipeline(IProducer<T>& producer, IConsumer<T>* consumer, std::string name, INotifier& notifier)
-    : producer_(producer), consumer_(consumer), name_(name), notifier_(notifier), queue_{ 32 }, running_{ false }
+  Pipeline(IProducer<T>& producer, IConsumer<T>* consumer, std::string name, INotifier& notifier,
+           const bool producer_fifo_scheduling = false)
+    : producer_(producer)
+    , consumer_(consumer)
+    , name_(name)
+    , notifier_(notifier)
+    , queue_{ 32 }
+    , running_{ false }
+    , producer_fifo_scheduling_(producer_fifo_scheduling)
   {
   }
   /*!
@@ -258,9 +307,16 @@ public:
    * \param producer The producer to run in the pipeline
    * \param name The pipeline's name
    * \param notifier The notifier to use
+   * \param producer_fifo_scheduling Should the producer thread use FIFO scheduling?
    */
-  Pipeline(IProducer<T>& producer, std::string name, INotifier& notifier)
-    : producer_(producer), consumer_(nullptr), name_(name), notifier_(notifier), queue_{ 32 }, running_{ false }
+  Pipeline(IProducer<T>& producer, std::string name, INotifier& notifier, const bool producer_fifo_scheduling = false)
+    : producer_(producer)
+    , consumer_(nullptr)
+    , name_(name)
+    , notifier_(notifier)
+    , queue_{ 32 }
+    , running_{ false }
+    , producer_fifo_scheduling_(producer_fifo_scheduling)
   {
   }
 
@@ -273,7 +329,15 @@ public:
     stop();
   }
 
-  void init(size_t max_num_tries = 0, std::chrono::milliseconds reconnection_time = std::chrono::seconds(10))
+  /*!
+   * \brief Initialize the pipeline. Internally calls setup of producer and consumer.
+   *
+   * \param max_num_tries Maximum number of connection attempts before counting the connection as
+   * failed. Unlimited number of attempts when set to 0.
+   * \param reconnection_time time in between connection attempts to the server
+   */
+  void init(const size_t max_num_tries = 0,
+            const std::chrono::milliseconds reconnection_time = std::chrono::seconds(10))
   {
     producer_.setupProducer(max_num_tries, reconnection_time);
     if (consumer_ != nullptr)
@@ -351,62 +415,18 @@ private:
   moodycamel::BlockingReaderWriterQueue<std::unique_ptr<T>> queue_;
   std::atomic<bool> running_;
   std::thread pThread_, cThread_;
+  bool producer_fifo_scheduling_;
 
   void runProducer()
   {
     URCL_LOG_DEBUG("Starting up producer");
-    //std::ifstream realtime_file("/sys/kernel/realtime", std::ios::in);
-    bool has_realtime = false;
-    //realtime_file >> has_realtime;
-    if (has_realtime)
+    if (producer_fifo_scheduling_)
     {
-      assert(false);
-      //const int max_thread_priority = sched_get_priority_max(SCHED_FIFO);
-      //if (max_thread_priority != -1)
-      //{
-      //  // We'll operate on the currently running thread.
-      //  pthread_t this_thread = pthread_self();
-
-      //  // struct sched_param is used to store the scheduling priority
-      //  struct sched_param params;
-
-      //  // We'll set the priority to the maximum.
-      //  params.sched_priority = max_thread_priority;
-
-      //  int ret = pthread_setschedparam(this_thread, SCHED_FIFO, &params);
-      //  if (ret != 0)
-      //  {
-      //    URCL_LOG_ERROR("Unsuccessful in setting producer thread realtime priority. Error code: %d", ret);
-      //  }
-      //  // Now verify the change in thread priority
-      //  int policy = 0;
-      //  ret = pthread_getschedparam(this_thread, &policy, &params);
-      //  if (ret != 0)
-      //  {
-      //    std::cout << "Couldn't retrieve real-time scheduling paramers" << std::endl;
-      //  }
-
-      //  // Check the correct policy was applied
-      //  if (policy != SCHED_FIFO)
-      //  {
-      //    URCL_LOG_ERROR("Producer thread: Scheduling is NOT SCHED_FIFO!");
-      //  }
-      //  else
-      //  {
-      //    URCL_LOG_INFO("Producer thread: SCHED_FIFO OK");
-      //  }
-
-      //  // Print thread scheduling priority
-      //  URCL_LOG_INFO("Thread priority is %d", params.sched_priority);
-      //}
-      //else
-      //{
-      //  URCL_LOG_ERROR("Could not get maximum thread priority for producer thread");
-      //}
-    }
-    else
-    {
-      URCL_LOG_WARN("No realtime capabilities found. Consider using a realtime system for better performance");
+#ifndef WIN32
+      pthread_t this_thread = pthread_self();
+      const int max_thread_priority = sched_get_priority_max(SCHED_FIFO);
+      setFiFoScheduling(this_thread, max_thread_priority);
+#endif
     }
     std::vector<std::unique_ptr<T>> products;
     while (running_)

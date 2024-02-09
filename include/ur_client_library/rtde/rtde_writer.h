@@ -153,8 +153,6 @@ public:
    */
   bool sendInputDoubleRegister(uint32_t register_id, double value);
 
-  bool sendExternalForceTorque(const vector6d_t& value);
-
 private:
   uint8_t pinToMask(uint8_t pin);
   comm::URStream<RTDEPackage>* stream_;

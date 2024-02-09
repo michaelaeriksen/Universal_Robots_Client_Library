@@ -32,8 +32,8 @@ implemented in order to create external applications leveraging the versatility 
 robotic manipulators.
 
 ## Requirements
- * **Polyscope** (The software running on the robot controller) version **3.12.0** (for CB3-Series),
-   or **5.5.1** (for e-Series) or higher. If you use an older Polyscope version it is suggested to
+ * **Polyscope** (The software running on the robot controller) version **3.14.3** (for CB3-Series),
+   or **5.9.4** (for e-Series) or higher. If you use an older Polyscope version it is suggested to
    update your robot. If for some reason (please tell us in the issues why) you cannot upgrade your
    robot, please see the [version compatibility table](doc/polyscope_compatibility.md) for a
    compatible tag.
@@ -380,6 +380,19 @@ int main(int argc, char* argv[])
   return 0;
 }
 ```
+
+## Contributor Guidelines
+* This repo supports [pre-commit](https://pre-commit.com/) e.g. for automatic code formatting. TLDR:
+  This will prevent you from committing falsely formatted code:
+  ```
+  pipx install pre-commit
+  pre-commit install
+  ```
+* Succeeding pipelines are a must on Pull Requests (unless there is a reason, e.g. when there have
+been upstream changes).
+* We try to increase and keep our code coverage high, so PRs with new
+features should also have tests covering them.
+* Parameters of public methods must all be documented.
 
 ## Acknowledgment
 Many parts of this library are forked from the [ur_modern_driver](https://github.com/ros-industrial/ur_modern_driver).

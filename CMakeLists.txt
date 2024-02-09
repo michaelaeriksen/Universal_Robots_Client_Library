@@ -21,10 +21,18 @@ set (SOURCE_FILES
   src/control/script_sender.cpp
   src/control/trajectory_point_interface.cpp
 
+  src/primary/robot_message/error_code_message.cpp
+  src/primary/robot_message/key_message.cpp
+  src/primary/robot_message/runtime_exception_message.cpp
+  src/primary/robot_message/text_message.cpp
   src/primary/robot_message/version_message.cpp
-  src/primary/robot_state/kinematics_info.cpp
 
+  src/primary/robot_state/kinematics_info.cpp
+  src/primary/robot_state/robot_mode_data.cpp
+
+  src/primary/primary_client.cpp
   src/primary/primary_package.cpp
+  src/primary/program_State_message.cpp
   src/primary/robot_message.cpp
   src/primary/robot_state.cpp
 
@@ -47,6 +55,7 @@ set (SOURCE_FILES
   src/ur/version_information.cpp
 
   src/default_log_handler.cpp
+  src/helpers.cpp
   src/log.cpp
 )
 

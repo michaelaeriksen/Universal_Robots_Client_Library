@@ -2,9 +2,8 @@
 
 // -- BEGIN LICENSE BLOCK ----------------------------------------------
 // Copyright 2019 FZI Forschungszentrum Informatik
-// Created on behalf of Universal Robots A/S
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Text 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -20,59 +19,69 @@
 //----------------------------------------------------------------------
 /*!\file
  *
- * \author  Lea Steffen steffen@fzi.de
- * \date    2019-04-01
+ * \author  Felix Exner exner@fzi.de
+ * \date    2020-04-23
  *
  */
 //----------------------------------------------------------------------
 
-#ifndef UR_CLIENT_LIBRARY_PRIMARY_PACKAGE_H_INCLUDED
-#define UR_CLIENT_LIBRARY_PRIMARY_PACKAGE_H_INCLUDED
+#ifndef UR_CLIENT_LIBRARY_PRIMARY_TEXT_MESSAGE_H_INCLUDED
+#define UR_CLIENT_LIBRARY_PRIMARY_TEXT_MESSAGE_H_INCLUDED
 
-#include "ur_client_library/primary/package_header.h"
-#include "ur_client_library/comm/package.h"
+#include "ur_client_library/primary/robot_message.h"
 
 namespace urcl
 {
 namespace primary_interface
 {
-class AbstractPrimaryConsumer;
-
 /*!
- * \brief The PrimaryPackage is solely an abstraction level.
- * It inherits form the URPackage and is also a parent class for primary_interface::RobotMessage,
- * primary_interface::RobotState
+ * \brief The TextMessage class handles the text messages sent via the primary UR interface.
  */
-class PrimaryPackage : public comm::URPackage<PackageHeader>
+class TextMessage : public RobotMessage
 {
 public:
+  TextMessage() = delete;
   /*!
-   * \brief Creates a new PrimaryPackage object.
+   * \brief Creates a new TextMessage object to be filled from a package.
+   *
+   * \param timestamp Timestamp of the package
+   * \param source The package's source
    */
-  PrimaryPackage() : buffer_length_(0)
+  TextMessage(uint64_t timestamp, int8_t source)
+    : RobotMessage(timestamp, source, RobotMessagePackageType::ROBOT_MESSAGE_TEXT)
   {
   }
-  virtual ~PrimaryPackage() = default;
+
+  /*!
+   * \brief Creates a copy of a TextMessage object.
+   *
+   * \param pkg The TextMessage object to be copied
+   */
+  TextMessage(const TextMessage& pkg)
+    : RobotMessage(pkg.timestamp_, pkg.source_, RobotMessagePackageType::ROBOT_MESSAGE_TEXT)
+  {
+    text_ = pkg.text_;
+  }
+  virtual ~TextMessage() = default;
 
   /*!
    * \brief Sets the attributes of the package by parsing a serialized representation of the
    * package.
    *
-   * \param bp A parser containing a serialized version of the package
+   * \param bp A parser containing a serialized text of the package
    *
    * \returns True, if the package was parsed successfully, false otherwise
    */
   virtual bool parseWith(comm::BinParser& bp);
 
   /*!
-   * \brief Consume this package with a specific consumer. This should be overwritten in inherited
-   * packages
+   * \brief Consume this package with a specific consumer.
    *
    * \param consumer Placeholder for the consumer calling this
    *
    * \returns true on success
    */
-  virtual bool consumeWith(AbstractPrimaryConsumer& consumer) = 0;
+  virtual bool consumeWith(AbstractPrimaryConsumer& consumer);
 
   /*!
    * \brief Produces a human readable representation of the package object.
@@ -81,12 +90,9 @@ public:
    */
   virtual std::string toString() const;
 
-protected:
-  std::unique_ptr<uint8_t[]> buffer_;
-  size_t buffer_length_;
+  std::string text_;
 };
-
 }  // namespace primary_interface
 }  // namespace urcl
 
-#endif /* UR_CLIENT_LIBRARY_PRIMARY_PACKAGE_H_INCLUDED */
+#endif  // ifndef UR_CLIENT_LIBRARY_PRIMARY_TEXT_MESSAGE_H_INCLUDED
