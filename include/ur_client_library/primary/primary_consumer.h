@@ -97,7 +97,7 @@ public:
    */
   virtual bool consume(VersionMessage& pkg) override
   {
-    URCL_LOG_ERROR("---VersionMessage---\n %s", pkg.toString().c_str());
+    URCL_LOG_INFO("---VersionMessage---\n %s", pkg.toString().c_str());
     return true;
   }
 
