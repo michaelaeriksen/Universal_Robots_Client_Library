@@ -25,7 +25,9 @@
  */
 //----------------------------------------------------------------------
 
+#ifdef WIN32
 #include <asio.hpp>
+#endif
 
 #include <ur_client_library/rtde/rtde_client.h>
 
@@ -61,15 +63,7 @@ int main(int argc, char* argv[])
   // TODO: Write good docstring for notifier
   comm::INotifier notifier;
   rtde_interface::RTDEClient my_client(robot_ip, notifier, OUTPUT_RECIPE, INPUT_RECIPE);
-  try
-  {
-    my_client.init(1, std::chrono::milliseconds(100));
-  }
-  catch (const UrException& rError)
-  {
-    std::cerr << rError.what() << std::endl;
-    return 0;
-  }
+  my_client.init();
 
   // We will use the speed_slider_fraction as an example how to write to RTDE
   double speed_slider_fraction = 1.0;

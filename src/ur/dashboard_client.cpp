@@ -34,7 +34,7 @@
 #include <ur_client_library/ur/dashboard_client.h>
 #include <ur_client_library/exceptions.h>
 
-using namespace std::literals;
+using namespace std::chrono_literals;
 
 #undef ERROR
 
@@ -49,7 +49,7 @@ void DashboardClient::rtrim(std::string& str, const std::string& chars)
   str.erase(str.find_last_not_of(chars) + 1);
 }
 
-bool DashboardClient::connect(size_t max_num_tries, std::chrono::milliseconds reconnection_time)
+bool DashboardClient::connect(const size_t max_num_tries, const std::chrono::milliseconds reconnection_time)
 {
   if (getState() == comm::SocketState::Connected)
   {
@@ -58,14 +58,16 @@ bool DashboardClient::connect(size_t max_num_tries, std::chrono::milliseconds re
   }
   bool ret_val = false;
 
+  auto configured_tv = getConfiguredReceiveTimeout();
+  std::chrono::seconds tv = 10s;
+
   while (not ret_val)
   {
     // The first read after connection can take more time.
-    TCPSocket::setReconnectionTime(reconnection_time);
-    TCPSocket::setReceiveTimeout(std::chrono::seconds(10));
+    TCPSocket::setReceiveTimeout(tv);
     try
     {
-      if (TCPSocket::setup(host_, port_, max_num_tries))
+      if (TCPSocket::setup(host_, port_, max_num_tries, reconnection_time))
       {
         URCL_LOG_INFO("%s", read().c_str());
         ret_val = true;
@@ -82,7 +84,8 @@ bool DashboardClient::connect(size_t max_num_tries, std::chrono::milliseconds re
     }
   }
 
-  TCPSocket::setReceiveTimeout(std::chrono::seconds(1));
+  // Reset read timeout to configured socket timeout
+  TCPSocket::setReceiveTimeout(configured_tv);
 
   std::string pv;
   commandPolyscopeVersion(pv);
@@ -443,19 +446,27 @@ bool DashboardClient::commandGetUserRole(std::string& user_role)
 bool DashboardClient::commandGenerateFlightReport(const std::string& report_type)
 {
   assertVersion("5.8.0", "3.13", "generate flight report");
+  auto configured_tv = getConfiguredReceiveTimeout();
   TCPSocket::setReceiveTimeout(180s);  // Set timeout to 3 minutes as this command can take a long time to complete
   bool ret = sendRequest("generate flight report " + report_type, "(?:Flight Report generated with id:).*");
-  TCPSocket::setReceiveTimeout(1s); // Reset timeout to standard timeout
+  TCPSocket::setReceiveTimeout(configured_tv);  // Reset to configured receive timeout
   return ret;
 }
 
 bool DashboardClient::commandGenerateSupportFile(const std::string& dir_path)
 {
   assertVersion("5.8.0", "3.13", "generate support file");
+  auto configured_tv = getConfiguredReceiveTimeout();
   TCPSocket::setReceiveTimeout(600s);  // Set timeout to 10 minutes as this command can take a long time to complete
   bool ret = sendRequest("generate support file " + dir_path, "(?:Completed successfully:).*");
-  TCPSocket::setReceiveTimeout(1s);  // Reset timeout to standard timeout
+  TCPSocket::setReceiveTimeout(configured_tv);  // Reset to configured receive timeout
   return ret;
+}
+
+bool DashboardClient::commandSaveLog()
+{
+  assertVersion("5.0.0", "1.8", "save log");
+  return sendRequest("saveLog", "Log saved to disk");
 }
 
 void DashboardClient::assertVersion(const std::string& e_series_min_ver, const std::string& cb3_min_ver,
@@ -487,6 +498,11 @@ void DashboardClient::assertVersion(const std::string& e_series_min_ver, const s
        << "'";
     throw UrException(ss.str());
   }
+}
+
+std::chrono::milliseconds DashboardClient::getConfiguredReceiveTimeout() const
+{
+  return 1s;
 }
 
 }  // namespace urcl

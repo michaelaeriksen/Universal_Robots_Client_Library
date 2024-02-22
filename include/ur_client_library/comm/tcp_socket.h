@@ -57,20 +57,27 @@ private:
   std::atomic<int> socket_fd_;
   std::atomic<SocketState> state_;
   std::chrono::milliseconds reconnection_time_;
+  bool reconnection_time_modified_deprecated_ = false;
+
+  void setupOptions();
 
 protected:
-  virtual bool open(int socket_fd, struct sockaddr* address, size_t address_len)
+  static bool open(int socket_fd, struct sockaddr* address, size_t address_len)
   {
-    return false;
+    return ::connect(socket_fd, address, address_len) == 0;
   }
-  virtual void setOptions(int socket_fd);
 
-  bool setup(std::string& host, int port, size_t max_num_tries = 0);
+  //virtual void setOptions(int socket_fd);
+
+  bool setup(const std::string& host, const int port, const size_t max_num_tries = 0,
+             const std::chrono::milliseconds reconnection_time = DEFAULT_RECONNECTION_TIME);
 
   std::chrono::milliseconds recv_timeout_;
   //std::unique_ptr<timeval> recv_timeout_;
 
 public:
+  static constexpr std::chrono::milliseconds DEFAULT_RECONNECTION_TIME{ 10000 };
+
   /*!
    * \brief Creates a TCPSocket object
    */

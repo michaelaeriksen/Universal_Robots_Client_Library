@@ -60,9 +60,14 @@ public:
   /*!
    * \brief Opens a connection to the dashboard server on the host as specified in the constructor.
    *
+   * \param max_num_tries Maximum number of connection attempts before counting the connection as
+   * failed. Unlimited number of attempts when set to 0.
+   * \param reconnection_time time in between connection attempts to the server
+   *
    * \returns True on successful connection, false otherwise.
    */
-  bool connect(size_t max_num_tries = 0, std::chrono::milliseconds reconnection_time = std::chrono::seconds(10));
+  bool connect(const size_t max_num_tries = 0,
+               const std::chrono::milliseconds reconnection_time = std::chrono::seconds(10));
 
   /*!
    * \brief Makes sure no connection to the dashboard server is held inside the object.
@@ -422,11 +427,12 @@ public:
    */
   bool commandGenerateSupportFile(const std::string& dir_path);
 
-protected:
-  virtual bool open(int socket_fd, struct sockaddr* address, size_t address_len)
-  {
-    return ::connect(socket_fd, address, address_len) == 0;
-  }
+  /*!
+   * \brief Flush the polyscope log to the log_history.txt file
+   *
+   * \return True succeeded
+   */
+  bool commandSaveLog();
 
 private:
   /*!
@@ -443,6 +449,14 @@ private:
   bool send(const std::string& text);
   std::string read();
   void rtrim(std::string& str, const std::string& chars = "\t\n\v\f\r ");
+
+  /*!
+   * \brief Gets the configured receive timeout. If receive timeout is unconfigured "normal" socket timeout of 1 second
+   * will be returned
+   *
+   * \returns configured receive timeout
+   */
+  std::chrono::milliseconds getConfiguredReceiveTimeout() const;
 
   VersionInformation polyscope_version_;
   std::string host_;

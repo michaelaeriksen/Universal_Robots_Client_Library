@@ -48,29 +48,39 @@ TCPSocket::~TCPSocket()
   close();
 }
 
-void TCPSocket::setOptions(int socket_fd)
+void TCPSocket::setupOptions()
 {
 #if WIN32
   BOOL bOptionValue = TRUE;
-  setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, (char*)&bOptionValue, sizeof(bOptionValue));
-  //setsockopt(socket_fd, IPPROTO_TCP, TCP_QUICKACK, &flag, sizeof(int));
+  setsockopt(socket_fd_, IPPROTO_TCP, TCP_NODELAY, (char*)&bOptionValue, sizeof(bOptionValue));
+  //setsockopt(socket_fd_, IPPROTO_TCP, TCP_QUICKACK, &flag, sizeof(int));
 
   const int timeout = recv_timeout_.count();
-  setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(int));
+  setsockopt(socket_fd_, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(int));
 #else
   int flag = 1;
-  setsockopt(socket_fd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(int));
-  setsockopt(socket_fd, IPPROTO_TCP, TCP_QUICKACK, &flag, sizeof(int));
+  setsockopt(socket_fd_, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(int));
+  setsockopt(socket_fd_, IPPROTO_TCP, TCP_QUICKACK, &flag, sizeof(int));
 
   if (recv_timeout_ != nullptr)
   {
-    setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, recv_timeout_.get(), sizeof(timeval));
+    setsockopt(socket_fd_, SOL_SOCKET, SO_RCVTIMEO, recv_timeout_.get(), sizeof(timeval));
   }
 #endif
 }
 
-bool TCPSocket::setup(std::string& host, int port, size_t max_num_tries)
+bool TCPSocket::setup(const std::string& host, const int port, const size_t max_num_tries,
+                      const std::chrono::milliseconds reconnection_time)
 {
+  auto reconnection_time_resolved = reconnection_time;
+  if (reconnection_time_modified_deprecated_)
+  {
+    URCL_LOG_WARN("TCPSocket::setup(): Reconnection time was modified using `setReconnectionTime()` which is "
+                  "deprecated. Please change your code to set reconnection_time through the `setup()` method "
+                  "directly. The value passed to this function will be ignored.");
+    reconnection_time_resolved = reconnection_time_;
+  }
+
   if (state_ == SocketState::Connected)
     return false;
 
@@ -132,7 +142,7 @@ bool TCPSocket::setup(std::string& host, int port, size_t max_num_tries)
       std::this_thread::sleep_for(reconnection_time_);
     }
   }
-  setOptions(socket_fd_);
+  setupOptions();
   state_ = SocketState::Connected;
   URCL_LOG_DEBUG("Connection established for %s:%d", host.c_str(), port);
   return connected;
@@ -235,7 +245,7 @@ void TCPSocket::setReceiveTimeout(const std::chrono::milliseconds& timeout)
 
   if (state_ == SocketState::Connected)
   {
-    setOptions(socket_fd_);
+    setupOptions();
   }
 }
 
