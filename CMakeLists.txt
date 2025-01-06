@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(ur_client_library)
+project(urcl)
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/" ${CMAKE_MODULE_PATH})
+# set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/" ${CMAKE_MODULE_PATH})
 
-if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
-  message("${PROJECT_NAME}: You did not request a specific build type: selecting 'RelWithDebInfo'.")
-  set(CMAKE_BUILD_TYPE RelWithDebInfo)
-endif()
+# if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+#   message("${PROJECT_NAME}: You did not request a specific build type: selecting 'RelWithDebInfo'.")
+#   set(CMAKE_BUILD_TYPE RelWithDebInfo)
+# endif()
 
 set (SOURCE_FILES
   src/comm/Server.cpp
@@ -123,11 +123,9 @@ add_library(urcl STATIC
   ${SOURCE_FILES} ${HEADER_FILES}
 )
 
-#set_target_properties(urcl PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS true)
-
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${SOURCE_FILES} ${HEADER_FILES})
 
-add_library(ur_client_library::urcl ALIAS urcl)
+add_library(urcl::urcl ALIAS urcl)
 
 find_package(asio REQUIRED)
 target_link_libraries(urcl PUBLIC asio::asio)
@@ -173,7 +171,7 @@ else()
 endif()
 
 
-add_subdirectory(examples)
+#add_subdirectory(examples)
 
 
 include(GNUInstallDirs)
@@ -184,20 +182,20 @@ install(TARGETS urcl EXPORT urcl_targets
 install(DIRECTORY include/ DESTINATION include)
 
 install(EXPORT urcl_targets
-  DESTINATION lib/cmake/ur_client_library
+  DESTINATION share/urcl
   FILE urclTargets.cmake
-  NAMESPACE ur_client_library::)
+  NAMESPACE urcl::)
 
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ur_client_libraryConfigVersion.cmake VERSION 0.0.3
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/urclConfigVersion.cmake VERSION 0.0.3
   COMPATIBILITY SameMajorVersion)
-install(FILES ur_client_libraryConfig.cmake
-  DESTINATION lib/cmake/ur_client_library)
+install(FILES urclConfig.cmake
+  DESTINATION share/urcl)
 
 # Install package.xml file so this package can be processed by ROS toolings
 # See REP 136 for details
 # Installing this in non-ROS environments won't have any effect, but it won't harm, either.
-install(FILES package.xml DESTINATION share/${PROJECT_NAME})
+#install(FILES package.xml DESTINATION share/${PROJECT_NAME})
 
 #### Begin import ####
 # Imported from ros-industrial/ros_industrial_cmake_boilerplate
@@ -207,12 +205,12 @@ install(FILES package.xml DESTINATION share/${PROJECT_NAME})
 # Licensed under Apache-2.0 license
 
 # Allows Colcon to find non-Ament packages when using workspace underlays
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/ament_index/resource_index/packages/${PROJECT_NAME} "")
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/ament_index/resource_index/packages/${PROJECT_NAME} DESTINATION share/ament_index/resource_index/packages)
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ament_prefix_path.dsv "prepend-non-duplicate;AMENT_PREFIX_PATH;")
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ament_prefix_path.dsv DESTINATION share/${PROJECT_NAME}/hook)
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ros_package_path.dsv "prepend-non-duplicate;ROS_PACKAGE_PATH;")
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ros_package_path.dsv DESTINATION share/${PROJECT_NAME}/hook)
+# file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/ament_index/resource_index/packages/${PROJECT_NAME} "")
+# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/ament_index/resource_index/packages/${PROJECT_NAME} DESTINATION share/ament_index/resource_index/packages)
+# file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ament_prefix_path.dsv "prepend-non-duplicate;AMENT_PREFIX_PATH;")
+# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ament_prefix_path.dsv DESTINATION share/${PROJECT_NAME}/hook)
+# file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ros_package_path.dsv "prepend-non-duplicate;ROS_PACKAGE_PATH;")
+# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/${PROJECT_NAME}/hook/ros_package_path.dsv DESTINATION share/${PROJECT_NAME}/hook)
 #### End iport ####
 
-install(DIRECTORY resources DESTINATION share/${PROJECT_NAME})
+# install(DIRECTORY resources DESTINATION share/${PROJECT_NAME})
