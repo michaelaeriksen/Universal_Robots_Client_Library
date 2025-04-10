@@ -40,7 +40,7 @@ namespace rtde_interface
 {
 RTDEClient::RTDEClient(std::string robot_ip, uint16_t port, comm::INotifier& notifier, const std::string& output_recipe_file,
                        const std::string& input_recipe_file, double target_frequency)
-  : stream_(robot_ip, string)
+  : stream_(robot_ip, port)
   , output_recipe_(ensureTimestampIsPresent(readRecipe(output_recipe_file)))
   , input_recipe_(readRecipe(input_recipe_file))
   , parser_(output_recipe_)
@@ -55,7 +55,7 @@ RTDEClient::RTDEClient(std::string robot_ip, uint16_t port, comm::INotifier& not
 
 RTDEClient::RTDEClient(std::string robot_ip, uint16_t port, comm::INotifier& notifier, const std::vector<std::string>& output_recipe,
                        const std::vector<std::string>& input_recipe, double target_frequency)
-  : stream_(robot_ip, string)
+  : stream_(robot_ip, port)
   , output_recipe_(ensureTimestampIsPresent(output_recipe))
   , input_recipe_(input_recipe)
   , parser_(output_recipe_)
