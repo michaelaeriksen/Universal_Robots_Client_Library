@@ -35,9 +35,9 @@ namespace urcl
 {
 namespace primary_interface
 {
-PrimaryClient::PrimaryClient(const std::string& robot_ip) : robot_ip_(robot_ip)
+PrimaryClient::PrimaryClient(const std::string& robot_ip, uint16_t port) : robot_ip_(robot_ip)
 {
-  stream_.reset(new comm::URStream<PrimaryPackage>(robot_ip_, UR_PRIMARY_PORT));
+  stream_.reset(new comm::URStream<PrimaryPackage>(robot_ip_, port));
   producer_.reset(new comm::URProducer<PrimaryPackage>(*stream_, parser_));
   producer_->setupProducer();
 

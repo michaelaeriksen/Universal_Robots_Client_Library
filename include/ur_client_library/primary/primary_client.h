@@ -45,7 +45,7 @@ class PrimaryClient
 {
 public:
   PrimaryClient() = delete;
-  PrimaryClient(const std::string& robot_ip);
+  PrimaryClient(const std::string& robot_ip, uint16_t port = UR_PRIMARY_PORT);
   virtual ~PrimaryClient() = default;
 
   /*!

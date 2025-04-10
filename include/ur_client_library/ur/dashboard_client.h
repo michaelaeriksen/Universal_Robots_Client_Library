@@ -46,16 +46,17 @@ namespace urcl
 class DashboardClient : public comm::TCPSocket
 {
 public:
+  static constexpr int DASHBOARD_SERVER_PORT = 29999;
+
+public:
   /*!
    * \brief Constructor that shall be used by default
    *
    * \param host IP address of the robot
    */
-  DashboardClient(const std::string& host);
+  DashboardClient(const std::string& host, uint16_t port = DASHBOARD_SERVER_PORT);
   DashboardClient() = delete;
   virtual ~DashboardClient() = default;
-
-  static constexpr int DASHBOARD_SERVER_PORT = 29999;
 
   /*!
    * \brief Opens a connection to the dashboard server on the host as specified in the constructor.

@@ -69,9 +69,9 @@ urcl::UrDriver::UrDriver(const std::string& robot_ip, const std::string& script_
 {
   URCL_LOG_DEBUG("Initializing urdriver");
   URCL_LOG_DEBUG("Initializing RTDE client");
-  rtde_client_.reset(new rtde_interface::RTDEClient(robot_ip_, notifier_, output_recipe_file, input_recipe_file));
+  rtde_client_.reset(new rtde_interface::RTDEClient(robot_ip_, UR_RTDE_PORT, notifier_, output_recipe_file, input_recipe_file));
 
-  primary_client_.reset(new primary_interface::PrimaryClient(robot_ip_));
+  primary_client_.reset(new primary_interface::PrimaryClient(robot_ip_, primary_interface::UR_PRIMARY_PORT));
 
   non_blocking_read_ = non_blocking_read;
   get_packet_timeout_ = non_blocking_read_ ? 0 : 100;

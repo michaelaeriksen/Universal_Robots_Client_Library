@@ -40,7 +40,7 @@ using namespace std::chrono_literals;
 
 namespace urcl
 {
-DashboardClient::DashboardClient(const std::string& host) : host_(host), port_(DASHBOARD_SERVER_PORT)
+DashboardClient::DashboardClient(const std::string& host, uint16_t port) : host_(host), port_(port)
 {
 }
 
